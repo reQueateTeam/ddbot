@@ -1,0 +1,28 @@
+{
+  "name": "ddbot",
+  "version": "1.0.0",
+  "description": "qq群dd机器人(API基于Mojo::qq)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DDMoment/ddbot.git"
+  },
+  "author": "ssysm",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/DDMoment/ddbot/issues"
+  },
+  "homepage": "https://github.com/DDMoment/ddbot#readme",
+  "keywords": [
+    "qqbot"
+  ],
+  "dependencies": {
+    "axios": "^0.17.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "mongojs": "^2.4.1"
+  }
+}
