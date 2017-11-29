@@ -23,6 +23,7 @@
     "axios": "^0.17.1",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
-    "mongojs": "^2.4.1"
+    "mongojs": "^2.4.1",
+    "querystring": "^0.2.0"
   }
 }
