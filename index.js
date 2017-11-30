@@ -45,7 +45,7 @@ app.post('/bot', (req, res) => {
                     }, (err, dep) => {
                         if (err) throw err;
                         else {
-                            if (dep) {
+                            if (dep.length !== 0) {
                                 console.log(dep)
                                 var message = `ddbot消息: \n ${dep[0].user}(${dep[0].userId}),您已经推 ${dep[0].idol},不能再推了`
                                 axios.post(message_api, querystring.stringify({
@@ -91,7 +91,7 @@ app.post('/bot', (req, res) => {
                 }
                 break;
             case /!ddbot/.test(content):
-                var content = content.match(botWord).input.replace(/[&\/\\#,+()$~%.'":*?<>!{}]/g, '');
+                var content = content.match(botWord).input.replace(/[&\/\\#,+()$~%.:*?<>!{}]/g, '');
                 var keyword = content.split(" ");
                 var command = keyword[1];
                 if (keyword[2]) var query = keyword[2];
@@ -157,7 +157,7 @@ app.post('/bot', (req, res) => {
                                                     throw err;
                                                 })
                                         } else {
-                                            var message = `ddbot消息:\n@${sender_uid},${docs[0].user}(${docs[0].userId}),是个dd,一共推${docs.length}个偶像,\nTA最近推的偶像是${docs[0].idol}`;
+                                            var message = `ddbot消息:\n@${sender_uid},${docs[0].user}(${docs[0].userId}),是个dd,一共推${docs.length}个偶像,\nTA推的第一个偶像是${docs[0].idol}\n最近推的偶像是${docs[docs.length-1].idol}`;
                                             axios.post(message_api, querystring.stringify({
                                                     uid: group_uid,
                                                     content: message
@@ -183,6 +183,7 @@ ddbot 帮助:\n
 手动命令:\n
 about -> 关于机器人\n
 lookup qq_id -> 用qq号(qq_id)来查询TA的圈 \n
+idol xxx -> 查询在群里被推的idol
 `
                         axios.post(message_api, querystring.stringify({
                                 uid: group_uid,
@@ -196,11 +197,71 @@ lookup qq_id -> 用qq号(qq_id)来查询TA的圈 \n
                                 throw err;
                             })
                         break;
+                    case "idol":
+                        if (!query) {
+                            axios.post(message_api, querystring.stringify({
+                                    uid: group_uid,
+                                    content: `ddbot消息:\n @${sender_uid},您没有写出想要查询的idol名字,范例:idol xxx`
+                                }))
+                                .then((response) => {
+                                    res.sendStatus(200);
+                                })
+                                .catch((err) => {
+                                    res.sendStatus(500);
+                                    throw err;
+                                })
+                        } else {
+                            userCollection.find({
+                                idol: query
+                            }, (err, docs) => {
+                                if (err) {
+                                    throw err
+                                } else {
+                                    if (docs.length == 0) {
+                                        var message = `ddbot消息:\n @${sender_uid},您查询的idol 「${query}」不存在`;
+                                        axios.post(message_api, querystring.stringify({
+                                                uid: group_uid,
+                                                content: message
+                                            }))
+                                            .then((response) => {
+                                                res.sendStatus(200);
+                                            })
+                                            .catch((err) => {
+                                                res.sendStatus(500);
+                                                throw err;
+                                            })
+                                    } else {
+                                        var message =
+                                            `
+ddbot消息:\n
+您查询的idol 「${docs[0].idol}」
+被${docs.length}个人推过,
+第一个推TA的是->${docs[0].user}(${docs[0].userId}),
+最近一个推TA的是->${docs[docs.length-1].user}(${docs[docs.length-1].userId})
+`;
+                                        axios.post(message_api, querystring.stringify({
+                                                uid: group_uid,
+                                                content: message
+                                            }))
+                                            .then((response) => {
+                                                res.sendStatus(200);
+                                            })
+                                            .catch((err) => {
+                                                res.sendStatus(500);
+                                                throw err;
+                                            })
+                                    }
+                                }
+                            })
+                        }
+                        break;
                     default:
                         res.sendStatus(200);
                         break;
                 }
         }
+    } else {
+        res.send(200);
     }
 })
 
