@@ -183,10 +183,11 @@ app.post('/bot', (req, res) => {
                         var message =
                             `
 ddbot 帮助:\n
-自动检测dd: 我永远（喜欢）...\n
+自动检测dd: 我永远（喜欢）...
 手动命令:\n
-about -> 关于机器人\n
-lookup qq_id -> 用qq号(qq_id)来查询TA的圈 \n
+about -> 关于机器人
+lookup qq_id -> 用qq号(qq_id)来查询TA的圈
+list qq_id -> 用qq号(qq_id)来查询TA推的前10个idol
 idol xxx -> 查询在群里被推的idol
 unlink xxx -> 解推一个idol
 `
@@ -289,7 +290,6 @@ ddbot消息:\n
                                 userId:sender_uid,
                                 idol:query
                             },(err,docs)=>{
-                                console.log(sender_uid,query)
                                 if(err) throw err;
                                 else{
                                     if(!docs){
@@ -326,6 +326,42 @@ ddbot消息:\n
                                             }
                                         })
                                     }
+                                }
+                            })
+                        }
+                        break;
+                        case "list":
+                        if (!query) {
+                            axios.post(message_api, querystring.stringify({
+                                    uid: group_uid,
+                                    content: `ddbot消息:\n @${sender_uid},您没有写出想要被查看qqid,范例:list ${sender_uid}`
+                                }))
+                                .then((response) => {
+                                    res.sendStatus(200);
+                                })
+                                .catch((err) => {
+                                    res.sendStatus(500);
+                                    throw err;
+                                })
+                        } else{
+                            userCollection.find({
+                                userId:sender_uid
+                            }).limit(10,(err,docs)=>{
+                                if(err){
+                                    throw err
+                                }else{
+                                    var message = `ddbot消息:\n@${sender_uid},${docs[0].userId}的偶像推列表为（MongoDB数据,只取前10）\n ${JSON.stringify(docs,null,2)}`
+                                    axios.post(message_api, querystring.stringify({
+                                        uid: group_uid,
+                                        content: message
+                                    }))
+                                    .then((response) => {
+                                        res.sendStatus(200);
+                                    })
+                                    .catch((err) => {
+                                        res.sendStatus(500);
+                                        throw err;
+                                    })
                                 }
                             })
                         }
