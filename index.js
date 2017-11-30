@@ -92,7 +92,11 @@ app.post('/bot', (req, res) => {
                 break;
             case /!ddbot/.test(content):
                 var content = content.match(botWord).input.replace(/[&\/\\#,+()$~%.:*?<>!{}]/g, '');
-                var keyword = content.split(" ");
+                var arr = content.split(" "),
+                    result = arr.splice(0,2);
+                    result.push(arr.join(" "));
+                var keyword = result;
+                console.log(keyword)
                 var command = keyword[1];
                 if (keyword[2]) var query = keyword[2];
                 switch (command) {
@@ -307,7 +311,7 @@ ddbot消息:\n
                                         },(err,remove)=>{
                                             if(err) throw err;
                                             else{
-                                                var message = `ddbot消息:\n@${sender},您已经不再推${docs.idol}了`
+                                                var message = `ddbot消息:\n@${sender_uid},您已经不再推${docs.idol}了`
                                                 axios.post(message_api, querystring.stringify({
                                                     uid: group_uid,
                                                     content: message
