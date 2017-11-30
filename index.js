@@ -233,13 +233,23 @@ unlink xxx -> 解推一个idol
                                                 throw err;
                                             })
                                     } else {
-                                        var message =
-                                            `
+                                        if (docs.length !== 1)
+                                            var message =
+                                                `
 ddbot消息:\n
 您查询的idol 「${docs[0].idol}」
 被${docs.length}个人推过,
 第一个推TA的是->${docs[0].user}(${docs[0].userId}),
 最近一个推TA的是->${docs[docs.length-1].user}(${docs[docs.length-1].userId})
+    `;
+                                        else if (docs.length === 1)
+                                            var message =
+                                        `
+ddbot消息:\n
+您查询的idol 「${docs[0].idol}」
+被${docs.length}个人推过,
+第一个和最近一个推TA的都是->${docs[0].user}(${docs[0].userId})
+迫真单推?
 `;
                                         axios.post(message_api, querystring.stringify({
                                                 uid: group_uid,
