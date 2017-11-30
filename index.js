@@ -32,7 +32,7 @@ app.post('/bot', (req, res) => {
     if (gpid.includes(group_uid)) {
         switch (true) {
             case /我永远喜欢/.test(content):
-                var content = content.match(triggerWord).input.replace(/[&\/\\#,+()$~%:*?<>!{}]/g, '');
+                var content = content.match(triggerWord).input.replace(/[&\/\\#,+()$@~%:*?<>!{}]/g, '');
                 var name = content.split("我永远喜欢")[1];
                 if (name !== "" && req.body.from !== "api") {
                     const data = new Object;
