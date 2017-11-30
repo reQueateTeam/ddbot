@@ -193,7 +193,7 @@ ddbot 帮助:\n
 手动命令:\n
 about -> 关于机器人
 lookup qq_id -> 用qq号(qq_id)来查询TA的圈
-list qq_id -> 用qq号(qq_id)来查询TA推的前10个idol
+list qq_id -> 用qq号(qq_id)来查询TA推的idol
 idol xxx -> 查询在群里被推的idol
 unlink xxx -> 解推一个idol
 `
@@ -350,13 +350,22 @@ ddbot消息:\n
                                             throw err;
                                         })
                                 } else {
+                                    var query = parseInt(query);
                                     userCollection.find({
-                                        userId: sender_uid
-                                    }).limit(10, (err, docs) => {
+                                        userId: query
+                                    }, (err, docs) => {
                                         if (err) {
                                             throw err
                                         } else {
-                                            var message = `ddbot消息:\n@${sender_uid},${docs[0].userId}的偶像推列表为（MongoDB数据,只取前10）\n ${JSON.stringify(docs, null, 2)}`
+                                            var minArray = new Array;
+                                            for(var i = 0;i < docs.length-1;i++){
+                                                var minify = new Object;
+                                                minify.qqid = docs[i].userId,
+                                                minify.user = docs[i].user,
+                                                minify.idol = docs[i].idol
+                                                minArray.push(minify);
+                                            }
+                                            var message = `ddbot消息:\n@${sender_uid},${docs[0].userId}的偶像推列表为（MongoDB数据）\n ${JSON.stringify(minArray, null, 2)}`
                                             axios.post(message_api, querystring.stringify({
                                                 uid: group_uid,
                                                 content: message
