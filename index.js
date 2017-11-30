@@ -33,7 +33,7 @@ app.post('/bot', (req, res) => {
     } = req.body;
     if (gpid.includes(group_uid)) {
         if (!content.match("@我")) {
-            if (!content.match("ddbot消息")) {
+            if (!content.match("ddbot消息")&& req.body.sender_uid !== req.body.receiver_uid ) {
                 switch (true) {
                     case /我永远喜欢/.test(content):
                         var content = content.match(triggerWord).input.replace(/[&\/\\#,+()$~%:*?<>{}]/g, '');
