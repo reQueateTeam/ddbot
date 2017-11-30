@@ -36,7 +36,7 @@ app.post('/bot', (req, res) => {
             if (!content.match("ddbot消息")) {
                 switch (true) {
                     case /我永远喜欢/.test(content):
-                        var content = content.match(triggerWord).input.replace(/[&\/\\#,+()$@~%:*?<>!{}]/g, '');
+                        var content = content.match(triggerWord).input.replace(/[&\/\\#,+()$~%:*?<>{}]/g, '');
                         var name = content.split("我永远喜欢")[1];
                         if (name !== "" && req.body.from !== "api") {
                             const data = new Object;
@@ -358,14 +358,12 @@ ddbot消息:\n
                                             throw err
                                         } else {
                                             var minArray = new Array;
-                                            for(var i = 0;i < docs.length-1;i++){
+                                            for(var i = 0;i < docs.length;i++){
                                                 var minify = new Object;
-                                                minify.qqid = docs[i].userId,
-                                                minify.user = docs[i].user,
                                                 minify.idol = docs[i].idol
                                                 minArray.push(minify);
                                             }
-                                            var message = `ddbot消息:\n@${sender_uid},${docs[0].userId}的偶像推列表为（MongoDB数据）\n ${JSON.stringify(minArray, null, 2)}`
+                                            var message = `ddbot消息:\n@${sender_uid},${docs[0].user}(${docs[0].userId})的偶像推列表为（JSON数据）\n ${JSON.stringify(minArray, null, 2)}`
                                             axios.post(message_api, querystring.stringify({
                                                 uid: group_uid,
                                                 content: message
