@@ -23,13 +23,15 @@ const api_base = "http://localhost:5000/openqq/";
 const message_api = api_base + "send_group_message";
 app.post('/bot', (req, res) => {
     console.log(req.body);
+    res.sendStatus(200);
     var {
         content,
         sender,
         sender_uid,
+        group,
         group_uid
     } = req.body;
-    if (gpid.includes(group_uid)) {
+    if (gpid.includes(group_uid) || !/ddbot消息/.test(content) || !/@/.test(content)) {
         switch (true) {
             case /我永远喜欢/.test(content):
                 var content = content.match(triggerWord).input.replace(/[&\/\\#,+()$@~%:*?<>!{}]/g, '');
@@ -39,6 +41,8 @@ app.post('/bot', (req, res) => {
                     data.user = sender;
                     data.userId = sender_uid;
                     data.idol = name;
+                    data.group = group;
+                    data.groupId = group_uid;
                     userCollection.find({
                         idol: data.idol,
                         userId: data.userId
@@ -371,9 +375,9 @@ ddbot消息:\n
                         break;
                 }
         }
-    } else {
-        res.send(200);
     }
 })
-
+app.get('/bot',(req,res)=>{
+    res.send('ok');
+})
 app.listen(3000);
