@@ -32,7 +32,7 @@ app.post('/bot', (req, res) => {
     if (gpid.includes(group_uid)) {
         switch (true) {
             case /我永远喜欢/.test(content):
-                var content = content.match(triggerWord).input.replace(/[&\/\\#,+()$~%.'":*?<>!{}]/g, '');
+                var content = content.match(triggerWord).input.replace(/[&\/\\#,+()$~%:*?<>!{}]/g, '');
                 var name = content.split("我永远喜欢")[1];
                 if (name !== "" && req.body.from !== "api") {
                     const data = new Object;
@@ -184,6 +184,7 @@ ddbot 帮助:\n
 about -> 关于机器人\n
 lookup qq_id -> 用qq号(qq_id)来查询TA的圈 \n
 idol xxx -> 查询在群里被推的idol
+unlink xxx -> 解推一个idol
 `
                         axios.post(message_api, querystring.stringify({
                                 uid: group_uid,
@@ -211,6 +212,7 @@ idol xxx -> 查询在群里被推的idol
                                     throw err;
                                 })
                         } else {
+                            console.log(query)
                             userCollection.find({
                                 idol: query
                             }, (err, docs) => {
@@ -250,6 +252,65 @@ ddbot消息:\n
                                                 res.sendStatus(500);
                                                 throw err;
                                             })
+                                    }
+                                }
+                            })
+                        }
+                        break;
+                        case "unlink":
+                        if (!query) {
+                            axios.post(message_api, querystring.stringify({
+                                    uid: group_uid,
+                                    content: `ddbot消息:\n @${sender_uid},您没有写出想要解推的idol名字,范例:unlink xxx`
+                                }))
+                                .then((response) => {
+                                    res.sendStatus(200);
+                                })
+                                .catch((err) => {
+                                    res.sendStatus(500);
+                                    throw err;
+                                })
+                        } else{
+                            userCollection.findOne({
+                                userId:sender_uid,
+                                idol:query
+                            },(err,docs)=>{
+                                console.log(sender_uid,query)
+                                if(err) throw err;
+                                else{
+                                    if(!docs){
+                                        var message = `ddbot消息:\n@${sender},您输入的信息有误，请重新输入`
+                                        axios.post(message_api, querystring.stringify({
+                                            uid: group_uid,
+                                            content: message
+                                        }))
+                                        .then((response) => {
+                                            res.sendStatus(200);
+                                        })
+                                        .catch((err) => {
+                                            res.sendStatus(500);
+                                            throw err;
+                                        })
+                                    }else{
+                                        userCollection.remove({
+                                            _id:mongojs.ObjectId(docs._id)
+                                        },(err,remove)=>{
+                                            if(err) throw err;
+                                            else{
+                                                var message = `ddbot消息:\n@${sender},您已经不再推${docs.idol}了`
+                                                axios.post(message_api, querystring.stringify({
+                                                    uid: group_uid,
+                                                    content: message
+                                                }))
+                                                .then((response) => {
+                                                    res.sendStatus(200);
+                                                })
+                                                .catch((err) => {
+                                                    res.sendStatus(500);
+                                                    throw err;
+                                                })
+                                            }
+                                        })
                                     }
                                 }
                             })
