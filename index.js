@@ -237,12 +237,16 @@ app.post('/bot', (req, res) => {
                                     `
 ddbot 帮助:\n
 自动检测dd: 我永远（喜欢）...
-手动命令:\n
+手动命令(前缀带!ddbot):\n
 about -> 关于机器人
 lookup qq_id -> 用qq号(qq_id)来查询TA的圈
 list qq_id -> 用qq号(qq_id)来查询TA推的idol
 idol xxx -> 查询在群里被推的idol
-unlink xxx -> 解推一个idol
+unlink xxx -> 解推一个idol\n
+标签命令(前缀带!tag):\n
+[tag名字] -> 直接返回在数据库里的tag内容
+create [tag名字] [tag内容] -> 创建新内容
+delete [tag名字] -> 删除tag
 `
                                 axios.post(message_api, querystring.stringify({
                                     uid: group_uid,
@@ -491,7 +495,7 @@ ddbot消息:\n
                                 if (!query) {
                                     axios.post(message_api, querystring.stringify({
                                         uid: group_uid,
-                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要创建的tag,范例:!tag create xxx`
+                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要创建tag内容,范例:!tag create [tag名字] [tag内容]`
                                     }))
                                         .then((response) => {
                                             res.sendStatus(200);
@@ -504,7 +508,7 @@ ddbot消息:\n
                                     if (!tag_content) {
                                         axios.post(message_api, querystring.stringify({
                                             uid: group_uid,
-                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要创建tag content,范例:!tag create [tag name] [tag content]`
+                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要创建tag内容,范例:!tag create [tag名字] [tag内容]`
                                         }))
                                             .then((response) => {
                                                 res.sendStatus(200);
@@ -547,7 +551,7 @@ ddbot消息:\n
                                                 }else{
                                                     axios.post(message_api, querystring.stringify({
                                                         uid: group_uid,
-                                                        content: `ddbot消息:\n @${sender_uid},tag{${docs.tag}} already exsit`
+                                                        content: `ddbot消息:\n @${sender_uid},tag「${docs.tag}」已经存在`
                                                     }))
                                                         .then((response) => {
                                                             res.sendStatus(200);
