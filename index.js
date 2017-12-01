@@ -483,10 +483,11 @@ ddbot消息:\n
                                 console.log(keyword)
                                 var command = keyword[1];
                                 if (keyword[2]) var query = keyword[2];
+                                if (keyword[3]) var content = keyword[3];
                                 switch (command) {
                                     case "create":
                                         //query不存在
-                                        if (!query) {
+                                        if (!query&&!content) {
                                             axios.post(message_api, querystring.stringify({
                                                     uid: group_uid,
                                                     content: `ddbot消息:\n @${sender_uid},您没有写出想要创建的tag,范例:!tag create xxx`
@@ -503,7 +504,8 @@ ddbot消息:\n
                                                 userId: sender_uid,
                                                 user: sender,
                                                 groupId: group_uid,
-                                                tag: query
+                                                tag: query,
+                                                content:content
                                             }
                                             tagCollection.save(tag, (err, docs) => {
                                                 if (err) throw err;
@@ -616,7 +618,7 @@ ddbot消息:\n
                                                     }else{
                                                         axios.post(message_api, querystring.stringify({
                                                             uid: group_uid,
-                                                            content: `ddbot消息:\n${docs.tag}`
+                                                            content: `ddbot消息:\n${docs.content}`
                                                         }))
                                                         .then((response) => {
                                                             res.sendStatus(200);
