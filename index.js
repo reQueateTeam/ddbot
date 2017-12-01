@@ -23,7 +23,9 @@ const api_base = "http://localhost:5000/openqq/";
 const message_api = api_base + "send_group_message";
 app.post('/bot', (req, res) => {
     console.log(req.body);
+    //TODO: 这个res可能会把程序卡掉
     res.sendStatus(200);
+    //es6确定事件变量
     var {
         content,
         sender,
@@ -31,28 +33,40 @@ app.post('/bot', (req, res) => {
         group,
         group_uid
     } = req.body;
+    //确认发送群在群白名单(group.js)
     if (gpid.includes(group_uid)) {
+        //防止有人 “@我永远喜欢xxx”
         if (!content.match("@我")) {
+            //防止自行反射命令
             if (!content.match("ddbot消息")&& req.body.sender_uid !== req.body.receiver_uid ) {
                 switch (true) {
+                    //自动检测部分
                     case /我永远喜欢/.test(content):
+                    //cotent filter
                         var content = content.match(triggerWord).input.replace(/[&\/\\#,+()$~%:*?<>{}]/g, '');
+                        //f提取名字
                         var name = content.split("我永远喜欢")[1];
+                        //确定不是空名字
+                        //TODO：确定不是拿空格当名字
                         if (name !== "" && req.body.from !== "api") {
+                            //确定对象常量
                             const data = new Object;
                             data.user = sender;
                             data.userId = sender_uid;
                             data.idol = name;
-                            data.group = group;
                             data.groupId = group_uid;
+                            //查询是否被推
                             userCollection.find({
                                 idol: data.idol,
                                 userId: data.userId
                             }, (err, dep) => {
+                                //直接throw错误
                                 if (err) throw err;
                                 else {
+                                    //如果已经被推
                                     if (dep.length !== 0) {
                                         console.log(dep)
+                                        //传出消息
                                         var message = `ddbot消息: \n ${dep[0].user}(${dep[0].userId}),您已经推 ${dep[0].idol},不能再推了`
                                         axios.post(message_api, querystring.stringify({
                                             uid: group_uid,
@@ -66,15 +80,19 @@ app.post('/bot', (req, res) => {
                                                 throw err;
                                             })
                                     } else {
+                                        //存储新推&idol
                                         userCollection.save(data, (err, docs) => {
+                                            //错误log到console
                                             if (err) {
                                                 console.log(err);
                                             } else {
+                                                //查询已推
                                                 userCollection.find({
                                                     userId: docs.userId
                                                 }, (err, user) => {
                                                     if (err) throw err;
                                                     else {
+                                                        //发送信息
                                                         var message = `ddbot消息: \n ${docs.user}(${docs.userId})刚刚加推了${docs.idol}\n现在TA一共推${user.length}个偶像`;
                                                         axios.post(message_api, querystring.stringify({
                                                             uid: group_uid,
@@ -96,8 +114,11 @@ app.post('/bot', (req, res) => {
                             })
                         }
                         break;
+                        //手动触发命令
                     case /!ddbot/.test(content):
+                        //filter
                         var content = content.match(botWord).input.replace(/[&\/\\#,+()$~%.:*?<>!{}]/g, '');
+                        //截取 command 和 query
                         var arr = content.split(" "),
                             result = arr.splice(0, 2);
                         result.push(arr.join(" "));
@@ -105,6 +126,7 @@ app.post('/bot', (req, res) => {
                         console.log(keyword)
                         var command = keyword[1];
                         if (keyword[2]) var query = keyword[2];
+                        //command开关
                         switch (command) {
                             case "about":
                                 var message = "ddbot:\n Made By github.com/ssysm \n Check Out at : github.com/ddmoment/ddbot\n Under GPLv3.0"
@@ -120,8 +142,10 @@ app.post('/bot', (req, res) => {
                                         throw err;
                                     })
                                 break;
+                            //用qq号查询推圈
                             case "lookup":
                                 if (!query) {
+                                    //没有query的情况下
                                     axios.post(message_api, querystring.stringify({
                                         uid: group_uid,
                                         content: `ddbot消息:\n @${sender_uid},您没有写出想要查询的qq号,范例:lookup ${sender_uid}`
@@ -134,12 +158,16 @@ app.post('/bot', (req, res) => {
                                             throw err;
                                         })
                                 } else {
+                                    //将query变成int
                                     var query = parseInt(query);
+                                    //查询数据库
                                     userCollection.find({
                                         userId: query
                                     }, (err, docs) => {
+                                        //直接throw错误
                                         if (err) throw err;
                                         else {
+                                            //没有推
                                             if (docs.length == 0) {
                                                 axios.post(message_api, querystring.stringify({
                                                     uid: group_uid,
@@ -153,6 +181,7 @@ app.post('/bot', (req, res) => {
                                                         throw err;
                                                     })
                                             } else {
+                                                //单推
                                                 if (docs.length == 1) {
                                                     var message = `ddbot消息:\n @${sender_uid},${docs[0].user}(${docs[0].userId},单推${docs[0].idol})`
                                                     axios.post(message_api, querystring.stringify({
@@ -167,6 +196,7 @@ app.post('/bot', (req, res) => {
                                                             throw err;
                                                         })
                                                 } else {
+                                                    //DD
                                                     var message = `ddbot消息:\n@${sender_uid},${docs[0].user}(${docs[0].userId}),是个dd,一共推${docs.length}个偶像,\nTA推的第一个偶像是${docs[0].idol}\n最近推的偶像是${docs[docs.length - 1].idol}`;
                                                     axios.post(message_api, querystring.stringify({
                                                         uid: group_uid,
@@ -185,6 +215,7 @@ app.post('/bot', (req, res) => {
                                     })
                                 }
                                 break;
+                                //帮助
                             case "help":
                                 var message =
                                     `
@@ -209,7 +240,9 @@ unlink xxx -> 解推一个idol
                                         throw err;
                                     })
                                 break;
+                                //查询idol
                             case "idol":
+                            //如果query不存在
                                 if (!query) {
                                     axios.post(message_api, querystring.stringify({
                                         uid: group_uid,
@@ -223,13 +256,17 @@ unlink xxx -> 解推一个idol
                                             throw err;
                                         })
                                 } else {
+                                    //query存在，查询
                                     console.log(query)
+                                    //调用数据库
                                     userCollection.find({
                                         idol: query
                                     }, (err, docs) => {
+                                        //直接throw错误
                                         if (err) {
                                             throw err
                                         } else {
+                                            //没有查询到
                                             if (docs.length == 0) {
                                                 var message = `ddbot消息:\n @${sender_uid},您查询的idol 「${query}」不存在`;
                                                 axios.post(message_api, querystring.stringify({
@@ -244,6 +281,7 @@ unlink xxx -> 解推一个idol
                                                         throw err;
                                                     })
                                             } else {
+                                                //查询到被多人推
                                                 if (docs.length !== 1)
                                                     var message =
                                                         `
@@ -253,6 +291,8 @@ ddbot消息:\n
 第一个推TA的是->${docs[0].user}(${docs[0].userId}),
 最近一个推TA的是->${docs[docs.length - 1].user}(${docs[docs.length - 1].userId})
     `;
+                                                //查询到被一人推
+                                                //代码by ct
                                                 else if (docs.length === 1)
                                                     var message =
                                                         `
@@ -278,7 +318,9 @@ ddbot消息:\n
                                     })
                                 }
                                 break;
+                                //解推idol
                             case "unlink":
+                                //query不存在
                                 if (!query) {
                                     axios.post(message_api, querystring.stringify({
                                         uid: group_uid,
@@ -292,12 +334,15 @@ ddbot消息:\n
                                             throw err;
                                         })
                                 } else {
+                                    //query存在，调用数据库
                                     userCollection.findOne({
                                         userId: sender_uid,
                                         idol: query
                                     }, (err, docs) => {
+                                        //直接throw错误
                                         if (err) throw err;
                                         else {
+                                            //如果没有找到解推的idol
                                             if (!docs) {
                                                 var message = `ddbot消息:\n@${sender},您输入的信息有误，请重新输入`
                                                 axios.post(message_api, querystring.stringify({
@@ -312,11 +357,14 @@ ddbot消息:\n
                                                         throw err;
                                                     })
                                             } else {
+                                                //找到解推的idol,执行删除操作
                                                 userCollection.remove({
                                                     _id: mongojs.ObjectId(docs._id)
                                                 }, (err, remove) => {
+                                                    //直接throw错误
                                                     if (err) throw err;
                                                     else {
+                                                        //发送信息
                                                         var message = `ddbot消息:\n@${sender_uid},您已经不再推${docs.idol}了`
                                                         axios.post(message_api, querystring.stringify({
                                                             uid: group_uid,
@@ -336,7 +384,9 @@ ddbot消息:\n
                                     })
                                 }
                                 break;
+                                //list操作
                             case "list":
+                            //query不存在
                                 if (!query) {
                                     axios.post(message_api, querystring.stringify({
                                         uid: group_uid,
@@ -350,19 +400,30 @@ ddbot消息:\n
                                             throw err;
                                         })
                                 } else {
+                                    //将query变成int
                                     var query = parseInt(query);
+                                    //执行数据库查询操作
                                     userCollection.find({
                                         userId: query
                                     }, (err, docs) => {
+                                        //直接throw错误
                                         if (err) {
                                             throw err
                                         } else {
+                                            //自定义阵列
                                             var minArray = new Array;
+                                            //for出最小队列
                                             for(var i = 0;i < docs.length;i++){
                                                 var minify = new Object;
                                                 minify.idol = docs[i].idol
                                                 minArray.push(minify);
                                             }
+                                            //发送信息
+                                            /*
+                                            注意！ 在这里有些人可能d的太多，腾讯会返回1202
+                                            这里可能需要修一下
+                                            （dd太可怕了
+                                            */
                                             var message = `ddbot消息:\n@${sender_uid},${docs[0].user}(${docs[0].userId})的偶像推列表为（JSON数据）\n ${JSON.stringify(minArray, null, 2)}`
                                             axios.post(message_api, querystring.stringify({
                                                 uid: group_uid,
@@ -379,6 +440,7 @@ ddbot消息:\n
                                     })
                                 }
                                 break;
+                                //默认
                             default:
                                 res.sendStatus(200);
                                 break;
@@ -391,4 +453,5 @@ ddbot消息:\n
 app.get('/bot', (req, res) => {
     res.send('ok');
 })
+//服务器监听端口
 app.listen(3000);
