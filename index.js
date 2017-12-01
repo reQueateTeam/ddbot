@@ -85,9 +85,9 @@ app.post('/bot', (req, res) => {
                                         //传出消息
                                         var message = `ddbot消息: \n ${dep[0].user}(${dep[0].userId}),您已经推 ${dep[0].idol},不能再推了`
                                         axios.post(message_api, querystring.stringify({
-                                            uid: group_uid,
-                                            content: message
-                                        }))
+                                                uid: group_uid,
+                                                content: message
+                                            }))
                                             .then((response) => {
                                                 res.sendStatus(200);
                                             })
@@ -111,9 +111,9 @@ app.post('/bot', (req, res) => {
                                                         //发送信息
                                                         var message = `ddbot消息: \n ${docs.user}(${docs.userId})刚刚加推了${docs.idol}\n现在TA一共推${user.length}个偶像`;
                                                         axios.post(message_api, querystring.stringify({
-                                                            uid: group_uid,
-                                                            content: message
-                                                        }))
+                                                                uid: group_uid,
+                                                                content: message
+                                                            }))
                                                             .then((response) => {
                                                                 res.sendStatus(200);
                                                             })
@@ -130,7 +130,7 @@ app.post('/bot', (req, res) => {
                             })
                         }
                         break;
-                    //手动触发命令
+                        //手动触发命令
                     case /!ddbot/.test(content):
                         //filter
                         var content = content.match(botWord).input.replace(/[&\/\\#,+()$~%.:*?<>!{}]/g, '');
@@ -147,9 +147,9 @@ app.post('/bot', (req, res) => {
                             case "about":
                                 var message = "ddbot:\n Made By github.com/ssysm \n Check Out at : github.com/ddmoment/ddbot\n Under GPLv3.0"
                                 axios.post(message_api, querystring.stringify({
-                                    uid: group_uid,
-                                    content: message
-                                }))
+                                        uid: group_uid,
+                                        content: message
+                                    }))
                                     .then((response) => {
                                         res.sendStatus(200);
                                     })
@@ -158,14 +158,14 @@ app.post('/bot', (req, res) => {
                                         throw err;
                                     })
                                 break;
-                            //用qq号查询推圈
+                                //用qq号查询推圈
                             case "lookup":
                                 if (!query) {
                                     //没有query的情况下
                                     axios.post(message_api, querystring.stringify({
-                                        uid: group_uid,
-                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要查询的qq号,范例:lookup ${sender_uid}`
-                                    }))
+                                            uid: group_uid,
+                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要查询的qq号,范例:lookup ${sender_uid}`
+                                        }))
                                         .then((response) => {
                                             res.sendStatus(200);
                                         })
@@ -186,9 +186,9 @@ app.post('/bot', (req, res) => {
                                             //没有推
                                             if (docs.length == 0) {
                                                 axios.post(message_api, querystring.stringify({
-                                                    uid: group_uid,
-                                                    content: `ddbot消息:\n @${sender_uid},这个人->${query},啥也不推,╮(╯▽╰)╭)`
-                                                }))
+                                                        uid: group_uid,
+                                                        content: `ddbot消息:\n @${sender_uid},这个人->${query},啥也不推,╮(╯▽╰)╭)`
+                                                    }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
                                                     })
@@ -206,9 +206,9 @@ app.post('/bot', (req, res) => {
                                                         if (docs.length == 1) {
                                                             var message = `ddbot消息:\n @${sender_uid},${docs[0].user}(${docs[0].userId}),单推${docs[0].idol}\nTA拥有${tag_data.length}个标签`
                                                             axios.post(message_api, querystring.stringify({
-                                                                uid: group_uid,
-                                                                content: message
-                                                            }))
+                                                                    uid: group_uid,
+                                                                    content: message
+                                                                }))
                                                                 .then((response) => {
                                                                     res.sendStatus(200);
                                                                 })
@@ -220,9 +220,9 @@ app.post('/bot', (req, res) => {
                                                             //DD
                                                             var message = `ddbot消息:\n@${sender_uid},${docs[0].user}(${docs[0].userId}),是个dd,一共推${docs.length}个偶像,\nTA推的第一个偶像是${docs[0].idol}\n最近推的偶像是${docs[docs.length - 1].idol}\nTA拥有${tag_data.length}个标签`;
                                                             axios.post(message_api, querystring.stringify({
-                                                                uid: group_uid,
-                                                                content: message
-                                                            }))
+                                                                    uid: group_uid,
+                                                                    content: message
+                                                                }))
                                                                 .then((response) => {
                                                                     res.sendStatus(200);
                                                                 })
@@ -238,7 +238,7 @@ app.post('/bot', (req, res) => {
                                     })
                                 }
                                 break;
-                            //帮助
+                                //帮助
                             case "help":
                                 var message =
                                     `
@@ -257,9 +257,9 @@ delete [tag名字] -> 删除tag
 lookup [tag名字] -> 查询在群里的tag
 search [tag名字（模糊）] -> 模糊搜索群里的tag`
                                 axios.post(message_api, querystring.stringify({
-                                    uid: group_uid,
-                                    content: message
-                                }))
+                                        uid: group_uid,
+                                        content: message
+                                    }))
                                     .then((response) => {
                                         res.sendStatus(200);
                                     })
@@ -268,14 +268,14 @@ search [tag名字（模糊）] -> 模糊搜索群里的tag`
                                         throw err;
                                     })
                                 break;
-                            //查询idol
+                                //查询idol
                             case "idol":
                                 //如果query不存在
                                 if (!query) {
                                     axios.post(message_api, querystring.stringify({
-                                        uid: group_uid,
-                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要查询的idol名字,范例:idol xxx`
-                                    }))
+                                            uid: group_uid,
+                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要查询的idol名字,范例:idol xxx`
+                                        }))
                                         .then((response) => {
                                             res.sendStatus(200);
                                         })
@@ -298,9 +298,9 @@ search [tag名字（模糊）] -> 模糊搜索群里的tag`
                                             if (docs.length == 0) {
                                                 var message = `ddbot消息:\n @${sender_uid},您查询的idol 「${query}」不存在`;
                                                 axios.post(message_api, querystring.stringify({
-                                                    uid: group_uid,
-                                                    content: message
-                                                }))
+                                                        uid: group_uid,
+                                                        content: message
+                                                    }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
                                                     })
@@ -331,9 +331,9 @@ ddbot消息:\n
 迫真单推?
 `;
                                                 axios.post(message_api, querystring.stringify({
-                                                    uid: group_uid,
-                                                    content: message
-                                                }))
+                                                        uid: group_uid,
+                                                        content: message
+                                                    }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
                                                     })
@@ -346,14 +346,14 @@ ddbot消息:\n
                                     })
                                 }
                                 break;
-                            //解推idol
+                                //解推idol
                             case "unlink":
                                 //query不存在
                                 if (!query) {
                                     axios.post(message_api, querystring.stringify({
-                                        uid: group_uid,
-                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要解推的idol名字,范例:unlink xxx`
-                                    }))
+                                            uid: group_uid,
+                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要解推的idol名字,范例:unlink xxx`
+                                        }))
                                         .then((response) => {
                                             res.sendStatus(200);
                                         })
@@ -374,9 +374,9 @@ ddbot消息:\n
                                             if (!docs) {
                                                 var message = `ddbot消息:\n@${sender},您输入的信息有误，请重新输入`
                                                 axios.post(message_api, querystring.stringify({
-                                                    uid: group_uid,
-                                                    content: message
-                                                }))
+                                                        uid: group_uid,
+                                                        content: message
+                                                    }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
                                                     })
@@ -395,9 +395,9 @@ ddbot消息:\n
                                                         //发送信息
                                                         var message = `ddbot消息:\n@${sender_uid},您已经不再推${docs.idol}了`
                                                         axios.post(message_api, querystring.stringify({
-                                                            uid: group_uid,
-                                                            content: message
-                                                        }))
+                                                                uid: group_uid,
+                                                                content: message
+                                                            }))
                                                             .then((response) => {
                                                                 res.sendStatus(200);
                                                             })
@@ -412,14 +412,14 @@ ddbot消息:\n
                                     })
                                 }
                                 break;
-                            //list操作
+                                //list操作
                             case "list":
                                 //query不存在
                                 if (!query) {
                                     axios.post(message_api, querystring.stringify({
-                                        uid: group_uid,
-                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要被查看qqid,范例:list ${sender_uid}`
-                                    }))
+                                            uid: group_uid,
+                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要被查看qqid,范例:list ${sender_uid}`
+                                        }))
                                         .then((response) => {
                                             res.sendStatus(200);
                                         })
@@ -455,9 +455,9 @@ ddbot消息:\n
                                                 */
                                                 var message = `ddbot消息:\n,${docs[0].user}(${docs[0].userId})的偶像推列表:\n ${JSON.stringify(minArray)}`
                                                 axios.post(message_api, querystring.stringify({
-                                                    uid: group_uid,
-                                                    content: message
-                                                }))
+                                                        uid: group_uid,
+                                                        content: message
+                                                    }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
                                                     })
@@ -467,9 +467,9 @@ ddbot消息:\n
                                                     })
                                             } else {
                                                 axios.post(message_api, querystring.stringify({
-                                                    uid: group_uid,
-                                                    content: `ddbot消息:\n @${sender_uid},Array Not Found or User Not Found`
-                                                }))
+                                                        uid: group_uid,
+                                                        content: `ddbot消息:\n @${sender_uid},Array Not Found or User Not Found`
+                                                    }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
                                                     })
@@ -502,9 +502,9 @@ ddbot消息:\n
                                 //query不存在
                                 if (!query) {
                                     axios.post(message_api, querystring.stringify({
-                                        uid: group_uid,
-                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要创建tag内容,范例:!tag create [tag名字] [tag内容]`
-                                    }))
+                                            uid: group_uid,
+                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要创建tag内容,范例:!tag create [tag名字] [tag内容]`
+                                        }))
                                         .then((response) => {
                                             res.sendStatus(200);
                                         })
@@ -515,9 +515,9 @@ ddbot消息:\n
                                 } else {
                                     if (!tag_content) {
                                         axios.post(message_api, querystring.stringify({
-                                            uid: group_uid,
-                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要创建tag内容,范例:!tag create [tag名字] [tag内容]`
-                                        }))
+                                                uid: group_uid,
+                                                content: `ddbot消息:\n @${sender_uid},您没有写出想要创建tag内容,范例:!tag create [tag名字] [tag内容]`
+                                            }))
                                             .then((response) => {
                                                 res.sendStatus(200);
                                             })
@@ -545,9 +545,9 @@ ddbot消息:\n
                                                         if (err) throw err;
                                                         else {
                                                             axios.post(message_api, querystring.stringify({
-                                                                uid: group_uid,
-                                                                content: `ddbot消息:\n @${sender_uid},tag创建成功,「${docs.tag}」`
-                                                            }))
+                                                                    uid: group_uid,
+                                                                    content: `ddbot消息:\n @${sender_uid},tag创建成功,「${docs.tag}」`
+                                                                }))
                                                                 .then((response) => {
                                                                     res.sendStatus(200);
                                                                 })
@@ -559,9 +559,9 @@ ddbot消息:\n
                                                     })
                                                 } else {
                                                     axios.post(message_api, querystring.stringify({
-                                                        uid: group_uid,
-                                                        content: `ddbot消息:\n @${sender_uid},tag「${docs.tag}」已经存在`
-                                                    }))
+                                                            uid: group_uid,
+                                                            content: `ddbot消息:\n @${sender_uid},tag「${docs.tag}」已经存在`
+                                                        }))
                                                         .then((response) => {
                                                             res.sendStatus(200);
                                                         })
@@ -579,9 +579,9 @@ ddbot消息:\n
                                 //query不存在
                                 if (!query) {
                                     axios.post(message_api, querystring.stringify({
-                                        uid: group_uid,
-                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要delete的tag,范例:!tag delete [tag name]`
-                                    }))
+                                            uid: group_uid,
+                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要delete的tag,范例:!tag delete [tag name]`
+                                        }))
                                         .then((response) => {
                                             res.sendStatus(200);
                                         })
@@ -599,9 +599,9 @@ ddbot消息:\n
                                         else {
                                             if (!docs) {
                                                 axios.post(message_api, querystring.stringify({
-                                                    uid: group_uid,
-                                                    content: `ddbot消息:\n @${sender_uid},您删除的tag不存在`
-                                                }))
+                                                        uid: group_uid,
+                                                        content: `ddbot消息:\n @${sender_uid},您删除的tag不存在`
+                                                    }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
                                                     })
@@ -616,9 +616,9 @@ ddbot消息:\n
                                                     if (err) throw err;
                                                     else {
                                                         axios.post(message_api, querystring.stringify({
-                                                            uid: group_uid,
-                                                            content: `ddbot消息:\n @${sender_uid},tag(${docs.tag})删除成功`
-                                                        }))
+                                                                uid: group_uid,
+                                                                content: `ddbot消息:\n @${sender_uid},tag(${docs.tag})删除成功`
+                                                            }))
                                                             .then((response) => {
                                                                 res.sendStatus(200);
                                                             })
@@ -636,9 +636,9 @@ ddbot消息:\n
                             case "lookup":
                                 if (!query) {
                                     axios.post(message_api, querystring.stringify({
-                                        uid: group_uid,
-                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要查看的tag,范例:!tag lookup [tag name]`
-                                    }))
+                                            uid: group_uid,
+                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要查看的tag,范例:!tag lookup [tag name]`
+                                        }))
                                         .then((response) => {
                                             res.sendStatus(200);
                                         })
@@ -655,9 +655,9 @@ ddbot消息:\n
                                         else {
                                             if (!docs) {
                                                 axios.post(message_api, querystring.stringify({
-                                                    uid: group_uid,
-                                                    content: `ddbot消息:\n @${sender_uid},数据库返回空数据`
-                                                }))
+                                                        uid: group_uid,
+                                                        content: `ddbot消息:\n @${sender_uid},数据库返回空数据`
+                                                    }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
                                                     })
@@ -674,9 +674,9 @@ ${docs.content}\n
 一共被使用了${docs.used}次
 `;
                                                 axios.post(message_api, querystring.stringify({
-                                                    uid: group_uid,
-                                                    content: message
-                                                }))
+                                                        uid: group_uid,
+                                                        content: message
+                                                    }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
                                                     })
@@ -689,12 +689,12 @@ ${docs.content}\n
                                     });
                                 }
                                 break;
-                                case "search":
+                            case "search":
                                 if (!query) {
                                     axios.post(message_api, querystring.stringify({
-                                        uid: group_uid,
-                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要搜索的tag,范例:!tag search [tag name]`
-                                    }))
+                                            uid: group_uid,
+                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要搜索的tag,范例:!tag search [tag name]`
+                                        }))
                                         .then((response) => {
                                             res.sendStatus(200);
                                         })
@@ -704,9 +704,12 @@ ${docs.content}\n
                                         })
                                 } else {
                                     tagCollection.find({
-                                        tag:{$regex: query.toString(), $options: 'i' },
-                                        groupId:group_uid
-                                    },(err,docs)=>{
+                                        tag: {
+                                            $regex: query.toString(),
+                                            $options: 'i'
+                                        },
+                                        groupId: group_uid
+                                    }, (err, docs) => {
                                         var minArray = new Array;
                                         //for出最小队列
                                         for (var i = 0; i < docs.length; i++) {
@@ -715,9 +718,9 @@ ${docs.content}\n
                                             minArray.push(minify);
                                         }
                                         axios.post(message_api, querystring.stringify({
-                                            uid: group_uid,
-                                            content: `ddbot消息:\n @${sender_uid},关于「${query}」的tag是:\n${minArray}`
-                                        }))
+                                                uid: group_uid,
+                                                content: `ddbot消息:\n @${sender_uid},关于「${query}」的tag是:\n${minArray}`
+                                            }))
                                             .then((response) => {
                                                 res.sendStatus(200);
                                             })
@@ -731,9 +734,9 @@ ${docs.content}\n
                             default:
                                 if (!command) {
                                     axios.post(message_api, querystring.stringify({
-                                        uid: group_uid,
-                                        content: `ddbot消息:\n @${sender_uid},请输入tag`
-                                    }))
+                                            uid: group_uid,
+                                            content: `ddbot消息:\n @${sender_uid},请输入tag`
+                                        }))
                                         .then((response) => {
                                             res.sendStatus(200);
                                         })
@@ -750,9 +753,9 @@ ${docs.content}\n
                                         else {
                                             if (!docs) {
                                                 axios.post(message_api, querystring.stringify({
-                                                    uid: group_uid,
-                                                    content: `ddbot消息:\n @${sender_uid},tag「${command}」不存在`
-                                                }))
+                                                        uid: group_uid,
+                                                        content: `ddbot消息:\n @${sender_uid},tag「${command}」不存在`
+                                                    }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
                                                     })
@@ -764,14 +767,14 @@ ${docs.content}\n
                                                 tagCollection.update({
                                                     _id: mongojs.ObjectId(docs._id)
                                                 }, {
-                                                        $inc: {
-                                                            used: 1
-                                                        }
-                                                    }, () => { });
+                                                    $inc: {
+                                                        used: 1
+                                                    }
+                                                }, () => {});
                                                 axios.post(message_api, querystring.stringify({
-                                                    uid: group_uid,
-                                                    content: `${docs.content}`
-                                                }))
+                                                        uid: group_uid,
+                                                        content: `${docs.content}`
+                                                    }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
                                                     })
@@ -787,7 +790,7 @@ ${docs.content}\n
                         }
                         break;
 
-                    //默认
+                        //默认
                     default:
                         res.sendStatus(200);
                         break;
