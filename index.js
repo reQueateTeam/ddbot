@@ -470,49 +470,84 @@ ddbot消息:\n
                                     })
                                 }
                                 break;
-                                break;
+                        }
+                        break;
 
-                            case /!tag/.test(content):
-                                //filter
-                                var content = content.replace(/[\/\\<>{}]/g, '');
-                                //截取 command 和 query
-                                var arr = content.split(" "),
-                                    result = arr.splice(0, 2);
-                                result.push(arr.join(" "));
-                                var keyword = result;
-                                console.log(keyword)
-                                var command = keyword[1];
-                                if (keyword[2]) var query = keyword[2];
-                                if (keyword[3]) var content = keyword[3];
-                                switch (command) {
-                                    case "create":
-                                        //query不存在
-                                        if (!query && !content) {
-                                            axios.post(message_api, querystring.stringify({
-                                                uid: group_uid,
-                                                content: `ddbot消息:\n @${sender_uid},您没有写出想要创建的tag,范例:!tag create xxx`
-                                            }))
-                                                .then((response) => {
-                                                    res.sendStatus(200);
-                                                })
-                                                .catch((err) => {
-                                                    res.sendStatus(500);
-                                                    throw err;
-                                                })
-                                        } else {
-                                            var tag = {
-                                                userId: sender_uid,
-                                                user: sender,
-                                                groupId: group_uid,
-                                                tag: query,
-                                                content: content
-                                            }
-                                            tagCollection.save(tag, (err, docs) => {
-                                                if (err) throw err;
-                                                else {
+                    case /!tag/.test(content):
+                        //filter
+                        var content = content.replace(/[\/\\<>{}]/g, '');
+                        //截取 command 和 query
+                        var arr = content.split(" "),
+                            result = arr.splice(0, 3);
+                        result.push(arr.join(" "));
+                        var keyword = result;
+                        console.log(keyword)
+                        var command = keyword[1];
+                        if (keyword[2]) var query = keyword[2];
+                        if (keyword[3]) var tag_content = keyword[3];
+                        switch (command) {
+                            case "create":
+                                //query不存在
+                                if (!query) {
+                                    axios.post(message_api, querystring.stringify({
+                                        uid: group_uid,
+                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要创建的tag,范例:!tag create xxx`
+                                    }))
+                                        .then((response) => {
+                                            res.sendStatus(200);
+                                        })
+                                        .catch((err) => {
+                                            res.sendStatus(500);
+                                            throw err;
+                                        })
+                                } else {
+                                    if (!tag_content) {
+                                        axios.post(message_api, querystring.stringify({
+                                            uid: group_uid,
+                                            content: `ddbot消息:\n @${sender_uid},您没有写出想要创建tag content,范例:!tag create [tag name] [tag content]`
+                                        }))
+                                            .then((response) => {
+                                                res.sendStatus(200);
+                                            })
+                                            .catch((err) => {
+                                                res.sendStatus(500);
+                                                throw err;
+                                            })
+                                    } else {
+                                        tagCollection.findOne({
+                                            tag:query,
+                                            groupId:group_uid
+                                        },(err,docs)=>{
+                                            if(err) throw err;
+                                            else{
+                                                if(!docs){
+                                                    var tag = {
+                                                        userId: sender_uid,
+                                                        user: sender,
+                                                        groupId: group_uid,
+                                                        tag: query,
+                                                        content: tag_content
+                                                    }
+                                                    tagCollection.save(tag, (err, docs) => {
+                                                        if (err) throw err;
+                                                        else {
+                                                            axios.post(message_api, querystring.stringify({
+                                                                uid: group_uid,
+                                                                content: `ddbot消息:\n @${sender_uid},tag创建成功,${docs.tag}`
+                                                            }))
+                                                                .then((response) => {
+                                                                    res.sendStatus(200);
+                                                                })
+                                                                .catch((err) => {
+                                                                    res.sendStatus(500);
+                                                                    throw err;
+                                                                })
+                                                        }
+                                                    })
+                                                }else{
                                                     axios.post(message_api, querystring.stringify({
                                                         uid: group_uid,
-                                                        content: `ddbot消息:\n @${sender_uid},tag创建成功,${docs.tag}`
+                                                        content: `ddbot消息:\n @${sender_uid},tag{${docs.tag}} already exsit`
                                                     }))
                                                         .then((response) => {
                                                             res.sendStatus(200);
@@ -522,124 +557,125 @@ ddbot消息:\n
                                                             throw err;
                                                         })
                                                 }
-                                            })
-                                        }
-                                        break;
-                                    case "delete":
-                                        //query不存在
-                                        if (!query) {
-                                            axios.post(message_api, querystring.stringify({
-                                                uid: group_uid,
-                                                content: `ddbot消息:\n @${sender_uid},您没有写出想要创建的tag,范例:!tag create xxx`
-                                            }))
-                                                .then((response) => {
-                                                    res.sendStatus(200);
-                                                })
-                                                .catch((err) => {
-                                                    res.sendStatus(500);
-                                                    throw err;
-                                                })
-                                        } else {
-                                            tagCollection.findOne({
-                                                tag: query,
-                                                groupId: group_uid,
-                                                userId: sender_uid
-                                            }, (err, docs) => {
-                                                if (err) throw err;
-                                                else {
-                                                    if (!docs) {
-                                                        axios.post(message_api, querystring.stringify({
-                                                            uid: group_uid,
-                                                            content: `ddbot消息:\n @${sender_uid},您删除的tag不存在`
-                                                        }))
-                                                            .then((response) => {
-                                                                res.sendStatus(200);
-                                                            })
-                                                            .catch((err) => {
-                                                                res.sendStatus(500);
-                                                                throw err;
-                                                            })
-                                                    } else {
-                                                        tagCollection.remove({
-                                                            _id: mongojs.ObjectId(docs._id)
-                                                        }, (err, docs) => {
-                                                            if (err) throw err;
-                                                            else {
-                                                                axios.post(message_api, querystring.stringify({
-                                                                    uid: group_uid,
-                                                                    content: `ddbot消息:\n @${sender_uid},tag(${docs.tag})删除成功`
-                                                                }))
-                                                                    .then((response) => {
-                                                                        res.sendStatus(200);
-                                                                    })
-                                                                    .catch((err) => {
-                                                                        res.sendStatus(500);
-                                                                        throw err;
-                                                                    })
-                                                            }
-                                                        })
-                                                    }
-                                                }
-                                            })
-                                        }
-                                        break;
-                                    default:
-                                        if (!command) {
-                                            axios.post(message_api, querystring.stringify({
-                                                uid: group_uid,
-                                                content: `ddbot消息:\n @${sender_uid},请输入tag`
-                                            }))
-                                                .then((response) => {
-                                                    res.sendStatus(200);
-                                                })
-                                                .catch((err) => {
-                                                    res.sendStatus(500);
-                                                    throw err;
-                                                })
-                                        } else {
-                                            tagCollection.findOne({
-                                                tag: command,
-                                                groupId: group_uid
-                                            }, (err, docs) => {
-                                                if (err) throw err;
-                                                else {
-                                                    if (!docs) {
-                                                        axios.post(message_api, querystring.stringify({
-                                                            uid: group_uid,
-                                                            content: `ddbot消息:\n @${sender_uid},tag「${command}」不存在`
-                                                        }))
-                                                            .then((response) => {
-                                                                res.sendStatus(200);
-                                                            })
-                                                            .catch((err) => {
-                                                                res.sendStatus(500);
-                                                                throw err;
-                                                            })
-                                                    } else {
-                                                        axios.post(message_api, querystring.stringify({
-                                                            uid: group_uid,
-                                                            content: `ddbot消息:\n${docs.content}`
-                                                        }))
-                                                            .then((response) => {
-                                                                res.sendStatus(200);
-                                                            })
-                                                            .catch((err) => {
-                                                                res.sendStatus(500);
-                                                                throw err;
-                                                            })
-                                                    }
-                                                }
-                                            })
-                                        }
-                                        break;
+                                            }
+                                        })
+                                    }
                                 }
                                 break;
-
-                            //默认
+                            case "delete":
+                                //query不存在
+                                if (!query) {
+                                    axios.post(message_api, querystring.stringify({
+                                        uid: group_uid,
+                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要delete的tag,范例:!tag delete [tag name]`
+                                    }))
+                                        .then((response) => {
+                                            res.sendStatus(200);
+                                        })
+                                        .catch((err) => {
+                                            res.sendStatus(500);
+                                            throw err;
+                                        })
+                                } else {
+                                    tagCollection.findOne({
+                                        tag: query,
+                                        groupId: group_uid,
+                                        userId: sender_uid
+                                    }, (err, docs) => {
+                                        if (err) throw err;
+                                        else {
+                                            if (!docs) {
+                                                axios.post(message_api, querystring.stringify({
+                                                    uid: group_uid,
+                                                    content: `ddbot消息:\n @${sender_uid},您删除的tag不存在`
+                                                }))
+                                                    .then((response) => {
+                                                        res.sendStatus(200);
+                                                    })
+                                                    .catch((err) => {
+                                                        res.sendStatus(500);
+                                                        throw err;
+                                                    })
+                                            } else {
+                                                tagCollection.remove({
+                                                    _id: mongojs.ObjectId(docs._id)
+                                                }, (err, docs) => {
+                                                    if (err) throw err;
+                                                    else {
+                                                        axios.post(message_api, querystring.stringify({
+                                                            uid: group_uid,
+                                                            content: `ddbot消息:\n @${sender_uid},tag(${docs.tag})删除成功`
+                                                        }))
+                                                            .then((response) => {
+                                                                res.sendStatus(200);
+                                                            })
+                                                            .catch((err) => {
+                                                                res.sendStatus(500);
+                                                                throw err;
+                                                            })
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    })
+                                }
+                                break;
                             default:
-                                res.sendStatus(200);
+                                if (!command) {
+                                    axios.post(message_api, querystring.stringify({
+                                        uid: group_uid,
+                                        content: `ddbot消息:\n @${sender_uid},请输入tag`
+                                    }))
+                                        .then((response) => {
+                                            res.sendStatus(200);
+                                        })
+                                        .catch((err) => {
+                                            res.sendStatus(500);
+                                            throw err;
+                                        })
+                                } else {
+                                    tagCollection.findOne({
+                                        tag: command,
+                                        groupId: group_uid
+                                    }, (err, docs) => {
+                                        if (err) throw err;
+                                        else {
+                                            if (!docs) {
+                                                axios.post(message_api, querystring.stringify({
+                                                    uid: group_uid,
+                                                    content: `ddbot消息:\n @${sender_uid},tag「${command}」不存在`
+                                                }))
+                                                    .then((response) => {
+                                                        res.sendStatus(200);
+                                                    })
+                                                    .catch((err) => {
+                                                        res.sendStatus(500);
+                                                        throw err;
+                                                    })
+                                            } else {
+                                                axios.post(message_api, querystring.stringify({
+                                                    uid: group_uid,
+                                                    content: `ddbot消息:\n${docs.content}`
+                                                }))
+                                                    .then((response) => {
+                                                        res.sendStatus(200);
+                                                    })
+                                                    .catch((err) => {
+                                                        res.sendStatus(500);
+                                                        throw err;
+                                                    })
+                                            }
+                                        }
+                                    })
+                                }
                                 break;
                         }
+                        break;
+
+                    //默认
+                    default:
+                        res.sendStatus(200);
+                        break;
                 }
             }
         }
