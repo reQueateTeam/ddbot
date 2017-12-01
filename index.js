@@ -254,7 +254,8 @@ unlink xxx -> 解推一个idol\n
 [tag名字] -> 直接返回在数据库里的tag内容
 create [tag名字] [tag内容] -> 创建新内容
 delete [tag名字] -> 删除tag
-lookup [tag名字] -> 查询在群里的tag`
+lookup [tag名字] -> 查询在群里的tag
+search [tag名字（模糊）] -> 模糊搜索群里的tag`
                                 axios.post(message_api, querystring.stringify({
                                     uid: group_uid,
                                     content: message
