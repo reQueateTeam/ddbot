@@ -426,12 +426,13 @@ ddbot消息:\n
                                         if (err) {
                                             throw err
                                         } else {
+                                            if(docs.length !== 0){
                                             //自定义阵列
                                             var minArray = new Array;
                                             //for出最小队列
                                             for(var i = 0;i < docs.length;i++){
                                                 var minify = new Object;
-                                                minify.idol = docs[i].idol
+                                                minify = docs[i].idol
                                                 minArray.push(minify);
                                             }
                                             //发送信息
@@ -440,7 +441,7 @@ ddbot消息:\n
                                             这里可能需要修一下
                                             （dd太可怕了
                                             */
-                                            var message = `ddbot消息:\n@${sender_uid},${docs[0].user}(${docs[0].userId})的偶像推列表为（JSON数据）\n ${JSON.stringify(minArray)}`
+                                            var message = `ddbot消息:\n,${docs[0].user}(${docs[0].userId})的偶像推列表:\n ${JSON.stringify(minArray)}`
                                             axios.post(message_api, querystring.stringify({
                                                 uid: group_uid,
                                                 content: message
@@ -452,7 +453,20 @@ ddbot消息:\n
                                                     res.sendStatus(500);
                                                     throw err;
                                                 })
+                                        }else{
+                                            axios.post(message_api, querystring.stringify({
+                                                uid: group_uid,
+                                                content: `ddbot消息:\n @${sender_uid},Array Not Found or User Not Found`
+                                            }))
+                                                .then((response) => {
+                                                    res.sendStatus(200);
+                                                })
+                                                .catch((err) => {
+                                                    res.sendStatus(500);
+                                                    throw err;
+                                                })
                                         }
+                                    }
                                     })
                                 }
                                 break;
@@ -492,11 +506,12 @@ ddbot消息:\n
                                         }
                                         tagCollection.save(tag,(err,docs)=>{
                                             if(err) throw err;
-
+ 
                                         })
                                     }
                                 }
                                 break;
+
                                 //默认
                                 default:
                                 res.sendStatus(200);
