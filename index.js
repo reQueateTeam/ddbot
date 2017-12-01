@@ -24,6 +24,7 @@ const db = mongojs('localhost:27017/ddbot');
 const app = express();
 //Config Database
 const userCollection = db.collection('user');
+const tagCollection = db.collection('tag');
 //Config Express Setting
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({
@@ -439,7 +440,7 @@ ddbot消息:\n
                                             这里可能需要修一下
                                             （dd太可怕了
                                             */
-                                            var message = `ddbot消息:\n@${sender_uid},${docs[0].user}(${docs[0].userId})的偶像推列表为（JSON数据）\n ${JSON.stringify(minArray, null, 2)}`
+                                            var message = `ddbot消息:\n@${sender_uid},${docs[0].user}(${docs[0].userId})的偶像推列表为（JSON数据）\n ${JSON.stringify(minArray)}`
                                             axios.post(message_api, querystring.stringify({
                                                 uid: group_uid,
                                                 content: message
@@ -455,8 +456,49 @@ ddbot消息:\n
                                     })
                                 }
                                 break;
+
+                                case /!tag/.test(content):
+                                //filter
+                                var content = content.replace(/[\/\\<>{}]/g, '');
+                                //截取 command 和 query
+                                var arr = content.split(" "),
+                                result = arr.splice(0, 2);
+                                result.push(arr.join(" "));
+                                var keyword = result;
+                                console.log(keyword)
+                                var command = keyword[1];
+                                if (keyword[2]) var query = keyword[2];
+                                switch (command){
+                                    case "create":
+                                    //query不存在
+                                    if (!query) {
+                                    axios.post(message_api, querystring.stringify({
+                                        uid: group_uid,
+                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要创建的tag,范例:!tag create xxx`
+                                    }))
+                                        .then((response) => {
+                                            res.sendStatus(200);
+                                        })
+                                        .catch((err) => {
+                                            res.sendStatus(500);
+                                            throw err;
+                                        })
+                                    }else{
+                                        var tag = {
+                                            userId:sender_uid,
+                                            user:sender,
+                                            groupId:group_uid,
+                                            tag : query
+                                        }
+                                        tagCollection.save(tag,(err,docs)=>{
+                                            if(err) throw err;
+
+                                        })
+                                    }
+                                }
+                                break;
                                 //默认
-                            default:
+                                default:
                                 res.sendStatus(200);
                                 break;
                         }
