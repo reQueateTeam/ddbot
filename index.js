@@ -545,7 +545,7 @@ ddbot消息:\n
                                                         else {
                                                             axios.post(message_api, querystring.stringify({
                                                                 uid: group_uid,
-                                                                content: `ddbot消息:\n @${sender_uid},tag创建成功,${docs.tag}`
+                                                                content: `ddbot消息:\n @${sender_uid},tag创建成功,「${docs.tag}」`
                                                             }))
                                                                 .then((response) => {
                                                                     res.sendStatus(200);
@@ -646,7 +646,6 @@ ddbot消息:\n
                                             throw err;
                                         })
                                 } else {
-                                    console.log(query);
                                     tagCollection.findOne({
                                         tag: query.toString(),
                                         groupId: group_uid
@@ -687,6 +686,45 @@ ${docs.content}\n
                                             }
                                         }
                                     });
+                                }
+                                break;
+                                case "search":
+                                if (!query) {
+                                    axios.post(message_api, querystring.stringify({
+                                        uid: group_uid,
+                                        content: `ddbot消息:\n @${sender_uid},您没有写出想要搜索的tag,范例:!tag search [tag name]`
+                                    }))
+                                        .then((response) => {
+                                            res.sendStatus(200);
+                                        })
+                                        .catch((err) => {
+                                            res.sendStatus(500);
+                                            throw err;
+                                        })
+                                } else {
+                                    tagCollection.find({
+                                        tag:{$regex: query.toString(), $options: 'i' },
+                                        groupId:group_uid
+                                    },(err,docs)=>{
+                                        var minArray = new Array;
+                                        //for出最小队列
+                                        for (var i = 0; i < docs.length; i++) {
+                                            var minify = new Object;
+                                            minify = docs[i].tag
+                                            minArray.push(minify);
+                                        }
+                                        axios.post(message_api, querystring.stringify({
+                                            uid: group_uid,
+                                            content: `ddbot消息:\n @${sender_uid},关于「${query}」的tag是:\n${minArray}`
+                                        }))
+                                            .then((response) => {
+                                                res.sendStatus(200);
+                                            })
+                                            .catch((err) => {
+                                                res.sendStatus(500);
+                                                throw err;
+                                            })
+                                    })
                                 }
                                 break;
                             default:
@@ -731,7 +769,7 @@ ${docs.content}\n
                                                     }, () => { });
                                                 axios.post(message_api, querystring.stringify({
                                                     uid: group_uid,
-                                                    content: `ddbot消息:\n${docs.content}`
+                                                    content: `${docs.content}`
                                                 }))
                                                     .then((response) => {
                                                         res.sendStatus(200);
