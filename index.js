@@ -146,7 +146,7 @@ app.post('/bot', (req, res) => {
                             //command开关
                             switch (command) {
                                 case "about":
-                                    var message = "ddbot:\n Made By github.com/ssysm \n Check Out at : github.com/reQueateTeam/ddbot\n Under GPLv3.0"
+                                    var message = "ddbot:\n Made By github.com/ssysm \n Check Out at : https://github.com/reQueateTeam/ddbot\n Under GPLv3.0"
                                     axios.post(message_api, querystring.stringify({
                                         uid: group_uid,
                                         content: message
